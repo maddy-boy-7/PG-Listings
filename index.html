@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PG Listing Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #004ecc;
+      --secondary: #d4008d;
+      --gradient-bg: linear-gradient(135deg, #0077cc, #00bcd4);
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: var(--gradient-bg);
+      background-size: 400% 400%;
+      animation: bgWave 10s ease infinite;
+    }
+
+    @keyframes bgWave {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+      animation: fadeIn 1s ease;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      color: #2e3a59;
+    }
+
+    .login {
+      text-align: center;
+      padding: 100px 20px;
+      color: white;
+    }
+
+    .login input {
+      padding: 12px;
+      font-size: 16px;
+      margin: 10px;
+      border-radius: 8px;
+      border: none;
+      width: 250px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .login button {
+      padding: 12px 24px;
+      font-size: 16px;
+      background: white;
+      color: var(--primary);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .login button:hover {
+      background: #eee;
+      transform: scale(1.05);
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    .filter-bar select {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .card {
+      background: white;
+      border-left: 6px solid var(--primary);
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      transition: transform 0.3s, box-shadow 0.3s;
+      animation: fadeInUp 0.5s ease;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .available {
+      color: green;
+      font-weight: bold;
+    }
+
+    .not-available {
+      color: crimson;
+      font-weight: bold;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+
+    @keyframes fadeInUp {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+  const data = [
+    { id: 1, title: "PG in Delhi", rent: 5000, location: "Delhi", available: true },
+    { id: 2, title: "PG in Mumbai", rent: 7000, location: "Mumbai", available: false },
+    { id: 3, title: "PG in Bangalore", rent: 6000, location: "Bangalore", available: true },
+    { id: 4, title: "PG in Pune", rent: 5500, location: "Pune", available: true },
+    { id: 5, title: "PG in Hyderabad", rent: 5200, location: "Hyderabad", available: false },
+    { id: 6, title: "PG in Chennai", rent: 4800, location: "Chennai", available: true }
+  ];
+
+  let user = null;
+  let filters = { location: "", rent: "", available: "" };
+
+  const render = () => {
+    const app = document.getElementById("app");
+    app.innerHTML = "";
+
+    if (!user) {
+      const login = document.createElement("div");
+      login.className = "login";
+      login.innerHTML = `
+        <h1>👋 Welcome Future Intern!</h1>
+        <p>Enter your name to explore PG Listings</p>
+        <input type="text" id="username" placeholder="Your name" />
+        <br>
+        <button onclick="loginUser()">Enter Portal</button>
+      `;
+      app.appendChild(login);
+      return;
+    }
+
+    const container = document.createElement("div");
+    container.className = "container";
+
+    container.innerHTML = `
+      <h1>Hi ${user}, Explore Your Ideal PG 🏠</h1>
+
+      <div class="filter-bar">
+        <select onchange="setFilter('location', this.value)">
+          <option value="">All Locations</option>
+          <option>Delhi</option>
+          <option>Mumbai</option>
+          <option>Bangalore</option>
+          <option>Pune</option>
+          <option>Hyderabad</option>
+          <option>Chennai</option>
+        </select>
+
+        <select onchange="setFilter('rent', this.value)">
+          <option value="">Max Rent</option>
+          <option value="4000">₹4000</option>
+          <option value="5000">₹5000</option>
+          <option value="6000">₹6000</option>
+          <option value="7000">₹7000</option>
+        </select>
+
+        <select onchange="setFilter('available', this.value)">
+          <option value="">All Status</option>
+          <option value="true">Available</option>
+          <option value="false">Not Available</option>
+        </select>
+      </div>
+    `;
+
+    const list = document.createElement("div");
+
+    const filtered = data.filter((p) => {
+      return (
+        (!filters.location || p.location === filters.location) &&
+        (!filters.rent || p.rent <= parseInt(filters.rent)) &&
+        (!filters.available || String(p.available) === filters.available)
+      );
+    });
+
+    filtered.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <h3>${p.title}</h3>
+        <p><strong>Rent:</strong> ₹${p.rent}</p>
+        <p><strong>Location:</strong> ${p.location}</p>
+        <p><strong>Status:</strong> 
+          <span class="${p.available ? 'available' : 'not-available'}">
+            ${p.available ? 'Available' : 'Not Available'}
+          </span>
+        </p>
+      `;
+      list.appendChild(card);
+    });
+
+    container.appendChild(list);
+    app.appendChild(container);
+  };
+
+  function loginUser() {
+    const input = document.getElementById("username");
+    if (input.value.trim()) {
+      user = input.value.trim();
+      render();
+    }
+  }
+
+  function setFilter(key, value) {
+    filters[key] = value;
+    render();
+  }
+
+  render();
+</script>
+
+</body>
+</html>
