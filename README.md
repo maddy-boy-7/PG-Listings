@@ -26,10 +26,6 @@ A responsive and modern portal for students to find PG (Paying Guest) accommodat
 
 ---
 
-## 🖼️ Screenshots
-
-> Add screenshots here (e.g., login page, filtered listings, responsive views)
-
 ---
 
 ## 🔧 Installation
